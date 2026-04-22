@@ -10,6 +10,7 @@
             --secondary: #e76f51;
             --bg: #f0f4f8;
             --white: #ffffff;
+            --error-bg: #fff5f5;
         }
 
         body {
@@ -33,15 +34,21 @@
         h1 { color: var(--primary); text-align: center; margin-bottom: 5px; }
         p.subtitle { text-align: center; color: #666; margin-bottom: 25px; font-style: italic; }
 
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
+        .form-group { margin-bottom: 20px; padding: 10px; border-radius: 8px; transition: background 0.3s; }
+        label.main-label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
 
-        select, input[type="date"] {
+        select {
             width: 100%;
             padding: 10px;
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
+        }
+
+        /* Highlight for incorrect fields */
+        .invalid-field {
+            background-color: var(--error-bg);
+            border: 2px solid var(--secondary);
         }
 
         .radio-grid {
@@ -53,8 +60,26 @@
             border-radius: 8px;
         }
 
-        .radio-item { display: flex; align-items: center; font-size: 14px; }
-        .radio-item input { margin-right: 8px; }
+        .radio-item { 
+            display: flex; 
+            align-items: center; 
+            font-size: 14px; 
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .radio-item:hover { background: #edf2f1; }
+        .radio-item input { margin-right: 8px; cursor: pointer; }
+
+        /* Visual State for checked radio buttons */
+        .radio-item.selected {
+            background-color: #e2eceb;
+            border-color: var(--primary);
+            font-weight: bold;
+        }
 
         button {
             width: 100%;
@@ -67,6 +92,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s;
+            margin-top: 10px;
         }
 
         button:hover { background-color: #21867a; }
@@ -78,6 +104,7 @@
             display: none;
             text-align: center;
             font-weight: bold;
+            line-height: 1.4;
         }
 
         .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
@@ -88,12 +115,12 @@
 
 <div class="container">
     <h1>🏥 A&E Injury Report</h1>
-    <p class="subtitle">Patient Intake Form (02/04/2026)</p>
+    <p class="subtitle">Patient Intake Form (April 2024)</p>
 
     <form id="medicalForm">
-        <div class="form-group">
-            <label for="name">Patient Name (1):</label>
-            <select id="name" required>
+        <div class="form-group" id="group-name">
+            <label class="main-label" for="name">Patient Name (1):</label>
+            <select id="name" required onchange="clearValidation()">
                 <option value="">-- Select Student --</option>
                 <option value="Alan TO">Alan TO</option>
                 <option value="Tom CHAN">Tom CHAN</option>
@@ -105,52 +132,56 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label>Injury (2):</label>
+        <div class="form-group" id="group-injury">
+            <label class="main-label">Injury (2):</label>
             <div class="radio-grid">
-                <div class="radio-item"><input type="radio" name="injury" value="broken arm"> broken arm</div>
-                <div class="radio-item"><input type="radio" name="injury" value="broken leg"> broken leg</div>
-                <div class="radio-item"><input type="radio" name="injury" value="cut"> cut</div>
-                <div class="radio-item"><input type="radio" name="injury" value="sting"> sting</div>
-                <div class="radio-item"><input type="radio" name="injury" value="bruise"> bruise</div>
-                <div class="radio-item"><input type="radio" name="injury" value="burn"> burn</div>
-                <div class="radio-item"><input type="radio" name="injury" value="twisted ankle"> twisted ankle</div>
+                <label class="radio-item"><input type="radio" name="injury" value="broken arm"> 💪 Broken arm</label>
+                <label class="radio-item"><input type="radio" name="injury" value="broken leg"> 🦵 Broken leg</label>
+                <label class="radio-item"><input type="radio" name="injury" value="cut"> 🩹 Cut</label>
+                <label class="radio-item"><input type="radio" name="injury" value="sting"> 🐝 Sting</label>
+                <label class="radio-item"><input type="radio" name="injury" value="bruise"> 🟣 Bruise</label>
+                <label class="radio-item"><input type="radio" name="injury" value="burn"> 🔥 Burn</label>
+                <label class="radio-item"><input type="radio" name="injury" value="twisted ankle"> 🦶 Twisted ankle</label>
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="date">Date of injury (3):</label>
-            <input type="date" id="date" value="2024-04-01" min="2024-04-01" max="2024-04-30">
-            <small style="color: #666;">Note: Month and year are fixed to April 2024.</small>
-        </div>
-
-        <div class="form-group">
-            <label for="place">Place injured (4):</label>
-            <select id="place" required>
-                <option value="">-- Select Location --</option>
-                <option value="home">home</option>
-                <option value="school">school</option>
-                <option value="work">work</option>
-                <option value="park">park</option>
-                <option value="beach">beach</option>
-                <option value="other">other</option>
+        <div class="form-group" id="group-day">
+            <label class="main-label" for="day">Day of injury (3):</label>
+            <select id="day" required>
+                <option value="">-- Select Day --</option>
+                <option value="01">1st April 2024</option>
+                <option value="02">2nd April 2024</option>
+                <option value="03">3rd April 2024</option>
             </select>
         </div>
 
-        <div class="form-group">
-            <label>Suggested treatment (5):</label>
+        <div class="form-group" id="group-place">
+            <label class="main-label" for="place">Place injured (4):</label>
+            <select id="place" required>
+                <option value="">-- Select Location --</option>
+                <option value="home">🏠 Home</option>
+                <option value="school">🏫 School</option>
+                <option value="work">🏢 Work</option>
+                <option value="park">🌳 Park</option>
+                <option value="beach">🏖️ Beach</option>
+                <option value="other">📍 Other</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="group-treatment">
+            <label class="main-label">Suggested treatment (5):</label>
             <div class="radio-grid">
-                <div class="radio-item"><input type="radio" name="treatment" value="plaster"> plaster</div>
-                <div class="radio-item"><input type="radio" name="treatment" value="bandage"> bandage</div>
-                <div class="radio-item"><input type="radio" name="treatment" value="cream/ointment"> cream/ointment</div>
+                <label class="radio-item"><input type="radio" name="treatment" value="plaster"> Plaster</label>
+                <label class="radio-item"><input type="radio" name="treatment" value="bandage"> Bandage</label>
+                <label class="radio-item"><input type="radio" name="treatment" value="cream/ointment"> Cream/Ointment</label>
             </div>
         </div>
 
-        <div class="form-group">
-            <label>Action taken (6):</label>
+        <div class="form-group" id="group-action">
+            <label class="main-label">Action taken (6):</label>
             <div class="radio-grid">
-                <div class="radio-item"><input type="radio" name="action" value="send home"> send home</div>
-                <div class="radio-item"><input type="radio" name="action" value="keep in hospital"> keep in hospital</div>
+                <label class="radio-item"><input type="radio" name="action" value="send home"> Send home</label>
+                <label class="radio-item"><input type="radio" name="action" value="keep in hospital"> Keep in hospital</label>
             </div>
         </div>
 
@@ -161,7 +192,6 @@
 </div>
 
 <script>
-    // Master database of correct answer sets
     const answerSets = {
         "Alex WANG": { injury: "broken arm", day: "03", place: "school", treatment: "bandage", action: "keep in hospital" },
         "Tina GREEN": { injury: "broken leg", day: "02", place: "work", treatment: "bandage", action: "keep in hospital" },
@@ -172,53 +202,62 @@
         "Simon WHITE": { injury: "twisted ankle", day: "02", place: "other", treatment: "bandage", action: "keep in hospital" }
     };
 
+    // UI Enhancement: Toggle 'selected' class for radio buttons
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const name = this.getAttribute('name');
+            document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                r.parentElement.classList.remove('selected');
+            });
+            if (this.checked) {
+                this.parentElement.classList.add('selected');
+            }
+        });
+    });
+
+    function clearValidation() {
+        document.querySelectorAll('.form-group').forEach(el => el.classList.remove('invalid-field'));
+        document.getElementById('message').style.display = 'none';
+    }
+
     function verifyForm() {
+        clearValidation();
+        
         const name = document.getElementById('name').value;
         const injury = document.querySelector('input[name="injury"]:checked')?.value;
-        const dateVal = document.getElementById('date').value; // YYYY-MM-DD
+        const day = document.getElementById('day').value;
         const place = document.getElementById('place').value;
         const treatment = document.querySelector('input[name="treatment"]:checked')?.value;
         const action = document.querySelector('input[name="action"]:checked')?.value;
-        const msgDiv = document.getElementById('message');
 
-        // Check if all fields are filled
-        if (!name || !injury || !dateVal || !place || !treatment || !action) {
-            showMessage("Please fill in all sections of the report!", "error");
+        if (!name || !injury || !day || !place || !treatment || !action) {
+            showMessage("⚠️ Please fill in all sections before submitting.", "error");
             return;
         }
 
-        const day = dateVal.split('-')[2]; // Extract DD
-        const correctSet = answerSets[name];
+        const correct = answerSets[name];
+        let errors = [];
 
-        // Validation Logic
-        if (correctSet && 
-            injury === correctSet.injury && 
-            day === correctSet.day && 
-            place === correctSet.place && 
-            treatment === correctSet.treatment && 
-            action === correctSet.action) {
-            showMessage("✅ Correct! The medical report is accurate.", "success");
+        // Track and highlight specific errors
+        if (injury !== correct.injury) { errors.push("Injury"); document.getElementById('group-injury').classList.add('invalid-field'); }
+        if (day !== correct.day) { errors.push("Date"); document.getElementById('group-day').classList.add('invalid-field'); }
+        if (place !== correct.place) { errors.push("Location"); document.getElementById('group-place').classList.add('invalid-field'); }
+        if (treatment !== correct.treatment) { errors.push("Treatment"); document.getElementById('group-treatment').classList.add('invalid-field'); }
+        if (action !== correct.action) { errors.push("Action"); document.getElementById('group-action').classList.add('invalid-field'); }
+
+        if (errors.length === 0) {
+            showMessage("✅ Correct! The medical report for " + name + " is accurate.", "success");
         } else {
-            showMessage("❌ Incorrect. Check your notes and try again.", "error");
+            showMessage("❌ Error in sections: " + errors.join(", ") + ".<br>Please check your notes and correct the highlighted fields.", "error");
         }
     }
 
     function showMessage(text, type) {
         const msgDiv = document.getElementById('message');
-        msgDiv.innerText = text;
+        msgDiv.innerHTML = text;
         msgDiv.className = type;
         msgDiv.style.display = 'block';
     }
-
-    // Lock the month/year of the date picker
-    document.getElementById('date').addEventListener('change', function(e) {
-        let val = e.target.value;
-        if (!val.startsWith('2024-04')) {
-            // Force back to April 2024 if they try to change it via keyboard
-            const day = val.split('-')[2] || "01";
-            e.target.value = `2024-04-${day}`;
-        }
-    });
 </script>
 
 </body>
